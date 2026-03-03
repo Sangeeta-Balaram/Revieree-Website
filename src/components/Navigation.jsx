@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, ShoppingBag, Heart, ChevronDown, User, LogOut } from "lucide-react";
-import logoRed from "../assets/images/logo no bg for red bg.png";
-import logoWhite from "../assets/images/revieree logo no bg.png";
+import logoRed from "../assets/images/logo-no-bg-for-red-bg.png";
+import logoWhite from "../assets/images/revieree-logo-no-bg.png";
 import { getCartItemCount } from "../utils/cart";
 import { getCurrentUser, signOut } from "../utils/auth";
 
