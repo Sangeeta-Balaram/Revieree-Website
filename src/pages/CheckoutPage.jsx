@@ -163,14 +163,6 @@ const CheckoutPage = () => {
           console.log("Payment success:", response);
           completeOrder(response.razorpay_payment_id);
         },
-        prefill: {
-          name: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
-          email: shippingInfo.email,
-          contact: shippingInfo.phone,
-        },
-        theme: {
-          color: "#B91C1C",
-        },
       };
 
       const razorpay = new Razorpay(options);
