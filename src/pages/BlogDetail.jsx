@@ -27,7 +27,7 @@ const BlogDetail = () => {
         <section className="relative h-[80vh] min-h-[550px] overflow-hidden">
           <div className="absolute inset-0">
             <img
-              src="/src/assets/images/adc8fc81eac678aba089250ca3074d47.jpg"
+              src="/assets/images/adc8fc81eac678aba089250ca3074d47.jpg"
               alt="Blog"
               className="w-full h-full object-cover"
             />

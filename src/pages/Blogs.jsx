@@ -59,7 +59,7 @@ const Blogs = () => {
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
-            src="/src/assets/images/adc8fc81eac678aba089250ca3074d47.jpg"
+            src="/assets/images/adc8fc81eac678aba089250ca3074d47.jpg"
             alt="Blogs"
             className="w-full h-full object-cover"
           />

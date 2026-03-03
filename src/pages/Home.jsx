@@ -830,7 +830,7 @@ const Home = () => {
       <section className="relative h-[100vh] min-h-[700px] flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <img
-          src="/src/assets/images/adc8fc81eac678aba089250ca3074d47.jpg"
+          src="/assets/images/adc8fc81eac678aba089250ca3074d47.jpg"
           alt="Hero Background"
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -909,7 +909,7 @@ const Home = () => {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-full h-full max-w-sm max-h-96 rounded-2xl overflow-hidden">
                     <img
-                      src="/src/assets/images/adc8fc81eac678aba089250ca3074d47.jpg"
+                      src="/assets/images/adc8fc81eac678aba089250ca3074d47.jpg"
                       alt="Background"
                       className="w-full h-full object-cover"
                     />

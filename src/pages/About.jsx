@@ -64,7 +64,7 @@ const About = () => {
       {/* Full Page Background */}
       <div className="fixed inset-0 -z-10">
         <img
-          src="/src/assets/images/about/ee25d2f193c3dbc7db0758a5720714de.jpg"
+          src="/assets/images/about/ee25d2f193c3dbc7db0758a5720714de.jpg"
           alt="Background"
           className="w-full h-full object-cover"
         />
@@ -74,7 +74,7 @@ const About = () => {
         {/* Background - Your Image */}
         <div className="absolute inset-0">
           <img
-            src="/src/assets/images/about/ee25d2f193c3dbc7db0758a5720714de.jpg"
+            src="/assets/images/about/ee25d2f193c3dbc7db0758a5720714de.jpg"
             alt="About Hero Background"
             className="w-full h-full object-cover"
           />
@@ -94,7 +94,7 @@ const About = () => {
                 {/* Left Side - Bigger Image */}
                 <div className="overflow-hidden rounded-3xl">
                   <img
-                    src="/src/assets/images/about/ee25d2f193c3dbc7db0758a5720714de.jpg"
+                    src="/assets/images/about/ee25d2f193c3dbc7db0758a5720714de.jpg"
                     alt="About Square"
                     className="w-full h-80 md:h-96 object-cover"
                   />
@@ -136,7 +136,7 @@ const About = () => {
               {/* Left - Vertical Rectangle Image */}
               <div className="relative h-[300px] lg:h-[400px] max-w-md overflow-hidden rounded-3xl shadow-2xl ">
                 <img
-                  src="/src/assets/images/about/LIPS.png"
+                  src="/assets/images/about/LIPS.png"
                   alt="About Us Story"
                   className="w-full h-full object-cover"
                 />
@@ -242,7 +242,7 @@ const About = () => {
             >
               <div className="overflow-hidden rounded-3xl shadow-2xl">
                 <img
-                  src="/src/assets/images/about/LIPS.png"
+                  src="/assets/images/about/LIPS.png"
                   alt="Our Philosophy"
                   className="w-full h-80 lg:h-96 object-cover"
                 />

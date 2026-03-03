@@ -361,7 +361,7 @@ const ScentQuiz = () => {
       <section className="relative h-[60vh] lg:h-[70vh] overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="/src/assets/images/adc8fc81eac678aba089250ca3074d47.jpg"
+            src="/assets/images/adc8fc81eac678aba089250ca3074d47.jpg"
             alt="Scent Quiz"
             className="w-full h-full object-cover"
           />
