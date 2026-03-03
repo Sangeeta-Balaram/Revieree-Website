@@ -1,0 +1,62 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        "dark-red": {
+          50: "#fef2f2",
+          100: "#fee2e2",
+          200: "#fecaca",
+          300: "#fca5a5",
+          400: "#f87171",
+          500: "#8B0000",
+          600: "#A52A2A",
+          700: "#7C0A02",
+          800: "#660000",
+          900: "#4a0000",
+        },
+        burgundy: {
+          50: "#fef2f3",
+          100: "#fde6e8",
+          200: "#faccce",
+          300: "#f7a3a8",
+          400: "#f26f78",
+          500: "#e8404d",
+          600: "#c92a36",
+          700: "#9A2530",
+          800: "#7d1e27",
+          900: "#5c1117",
+        },
+        cream: {
+          50: "#fefdfb",
+          100: "#fdfbf7",
+          200: "#fbf6ef",
+          300: "#f8f0e5",
+          400: "#f5e9d8",
+          500: "#f0ddc7",
+          600: "#FFF8DC",
+          700: "#F5F5DC",
+        },
+        gold: {
+          50: "#fffef0",
+          100: "#fefce8",
+          200: "#fef9c3",
+          300: "#fef08a",
+          400: "#fde047",
+          500: "#D4AF37",
+          600: "#FFD700",
+          700: "#b8860b",
+          800: "#92400e",
+          900: "#78350f",
+        },
+      },
+      fontFamily: {
+        "luxury-serif": ["Playfair Display", "Bodoni MT", "serif"],
+        serif: ["Libre Baskerville", "serif"],
+        sans: ["Montserrat", "Poppins", "system-ui", "sans-serif"],
+      },
+    },
+  },
+  plugins: [],
+};
