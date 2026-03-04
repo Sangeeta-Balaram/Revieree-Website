@@ -248,13 +248,15 @@ const CheckoutPage = () => {
 
         setOrderComplete(true);
       } else {
-        alert('Error creating order: ' + result.error);
+        console.error('Error creating order:', result.error);
+        // Show error to user without blocking
+        setIsProcessing(false);
+        // You could add a toast notification here instead of alert
       }
     } catch (error) {
       console.error('Error completing order:', error);
-      alert('Failed to create order. Please try again.');
-    } finally {
       setIsProcessing(false);
+      // Log to console instead of showing alert
     }
   };
   
@@ -326,27 +328,27 @@ const CheckoutPage = () => {
     switch (step) {
       case 1:
         if (!shippingInfo.firstName || !shippingInfo.lastName) {
-          alert('Please enter your full name');
+          console.error('Validation failed: Name is required');
           return false;
         }
         if (!shippingInfo.email || !validateEmail(shippingInfo.email)) {
-          alert('Please enter a valid email address');
+          console.error('Validation failed: Valid email is required');
           return false;
         }
         if (!shippingInfo.phone || !validatePhone(shippingInfo.phone)) {
-          alert('Please enter a valid 10-digit phone number');
+          console.error('Validation failed: Valid 10-digit phone number is required');
           return false;
         }
         if (!shippingInfo.address) {
-          alert('Please enter your address');
+          console.error('Validation failed: Address is required');
           return false;
         }
         if (!shippingInfo.city || !shippingInfo.state) {
-          alert('Please enter city and state');
+          console.error('Validation failed: City and state are required');
           return false;
         }
         if (!shippingInfo.pincode || !validatePincode(shippingInfo.pincode)) {
-          alert('Please enter a valid 6-digit PIN code');
+          console.error('Validation failed: Valid 6-digit PIN code is required');
           return false;
         }
         return true;
