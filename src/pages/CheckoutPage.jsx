@@ -23,6 +23,7 @@ import {
   Package,
 } from "lucide-react";
 import { updateCartQuantity, removeFromCart } from "../utils/cart";
+import { createOrder, PAYMENT_METHODS, PAYMENT_STATUS } from "../utils/supabaseOrders";
 import heroBgImg from "../assets/images/adc8fc81eac678aba089250ca3074d47.jpg";
 
 const CheckoutPage = () => {
@@ -106,8 +107,8 @@ const CheckoutPage = () => {
     savePayment: false,
   });
 
-  // Razorpay configuration - Replace with your actual key from Razorpay Dashboard
-  const RAZORPAY_KEY_ID = "rzp_test_SMmWQVteSJqyUm";
+  // Razorpay configuration - Replace with your LIVE key when ready for production
+  const RAZORPAY_KEY_ID = "rzp_test_SMmWQVteSJqyUm"; // TODO: Replace with rzp_live_XXXXX for production
 
   const initializeRazorpay = () => {
     return new Promise((resolve) => {
@@ -132,7 +133,7 @@ const CheckoutPage = () => {
         currency: "INR",
         name: "Revieree",
         description: "Order Payment",
-        image: "https://yourwebsite.com/logo.png",
+        image: "https://revieree.shop/assets/images/logo.png",
         prefill: {
           name: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
           email: shippingInfo.email,
@@ -180,11 +181,77 @@ const CheckoutPage = () => {
     }
   };
 
-  const completeOrder = (paymentId = null) => {
-    const orderNum = "ORD" + Date.now().toString().slice(-8);
-    setOrderNumber(orderNum);
-    setOrderComplete(true);
-    setIsProcessing(false);
+  const completeOrder = async (paymentId = null) => {
+    try {
+      // Prepare order data
+      const orderData = {
+        customerName: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
+        customerEmail: shippingInfo.email,
+        customerPhone: shippingInfo.phone,
+
+        // Items - map to proper format
+        items: items.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.selectedVariation?.price || item.price,
+          quantity: item.quantity,
+          image: item.image,
+          variation: item.selectedVariation?.size || item.selectedVariation?.shade || 'Standard'
+        })),
+
+        // Pricing
+        subtotal: getSubtotal(),
+        shippingCharge: getShipping(),
+        totalAmount: getTotal(),
+        tax: Math.round(getSubtotal() * 0.18), // 18% GST
+
+        // Payment info
+        paymentMethod: paymentInfo.method === 'cod' ? PAYMENT_METHODS.COD : PAYMENT_METHODS.RAZORPAY,
+        paymentStatus: paymentInfo.method === 'cod' ? PAYMENT_STATUS.UNPAID : PAYMENT_STATUS.PAID,
+        transactionId: paymentId,
+
+        // Addresses
+        shippingAddress: {
+          firstName: shippingInfo.firstName,
+          lastName: shippingInfo.lastName,
+          street: shippingInfo.address,
+          city: shippingInfo.city,
+          state: shippingInfo.state,
+          pincode: shippingInfo.pincode,
+          country: shippingInfo.country,
+          phone: shippingInfo.phone,
+          email: shippingInfo.email
+        },
+        billingAddress: billingInfo.sameAsShipping ? {
+          firstName: shippingInfo.firstName,
+          lastName: shippingInfo.lastName,
+          street: shippingInfo.address,
+          city: shippingInfo.city,
+          state: shippingInfo.state,
+          pincode: shippingInfo.pincode,
+          country: shippingInfo.country
+        } : billingInfo,
+      };
+
+      // Create order in Supabase
+      const result = await createOrder(orderData);
+
+      if (result.success) {
+        const orderNum = result.order.order_number;
+        setOrderNumber(orderNum);
+        setOrderComplete(true);
+
+        // Clear cart after successful order
+        items.forEach(item => removeFromCart(item.id));
+      } else {
+        alert('Error creating order: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error completing order:', error);
+      alert('Failed to create order. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
   
   const [accountInfo, setAccountInfo] = useState({
