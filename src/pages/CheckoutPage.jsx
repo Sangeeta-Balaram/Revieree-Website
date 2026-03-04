@@ -239,10 +239,14 @@ const CheckoutPage = () => {
       if (result.success) {
         const orderNum = result.order.order_number;
         setOrderNumber(orderNum);
-        setOrderComplete(true);
 
         // Clear cart after successful order
         items.forEach(item => removeFromCart(item.id));
+
+        // Clear items state to update UI
+        setItems([]);
+
+        setOrderComplete(true);
       } else {
         alert('Error creating order: ' + result.error);
       }
@@ -304,19 +308,48 @@ const CheckoutPage = () => {
     setItems(prevItems => prevItems.filter(item => item.id !== productId));
   };
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(phone.replace(/[\s\-\+]/g, ''));
+  };
+
+  const validatePincode = (pincode) => {
+    return /^[0-9]{6}$/.test(pincode);
+  };
+
   const validateStep = (step) => {
     switch (step) {
       case 1:
-        return (
-          shippingInfo.firstName &&
-          shippingInfo.lastName &&
-          shippingInfo.email &&
-          shippingInfo.phone &&
-          shippingInfo.address &&
-          shippingInfo.city &&
-          shippingInfo.state &&
-          shippingInfo.pincode
-        );
+        if (!shippingInfo.firstName || !shippingInfo.lastName) {
+          alert('Please enter your full name');
+          return false;
+        }
+        if (!shippingInfo.email || !validateEmail(shippingInfo.email)) {
+          alert('Please enter a valid email address');
+          return false;
+        }
+        if (!shippingInfo.phone || !validatePhone(shippingInfo.phone)) {
+          alert('Please enter a valid 10-digit phone number');
+          return false;
+        }
+        if (!shippingInfo.address) {
+          alert('Please enter your address');
+          return false;
+        }
+        if (!shippingInfo.city || !shippingInfo.state) {
+          alert('Please enter city and state');
+          return false;
+        }
+        if (!shippingInfo.pincode || !validatePincode(shippingInfo.pincode)) {
+          alert('Please enter a valid 6-digit PIN code');
+          return false;
+        }
+        return true;
       case 2:
         return true; // Razorpay handles validation
       default:

@@ -37,8 +37,11 @@ export const PAYMENT_METHODS = {
 export const createOrder = async (orderData) => {
   try {
     if (!supabase) {
+      console.error('Supabase not configured - check environment variables');
       throw new Error('Supabase not configured');
     }
+
+    console.log('Creating order with data:', orderData);
 
     // Calculate totals
     const subtotal = orderData.subtotal || orderData.totalAmount || 0;
@@ -96,9 +99,11 @@ export const createOrder = async (orderData) => {
 
     if (error) {
       console.error('Supabase order creation error:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
       throw error;
     }
 
+    console.log('Order created successfully:', data);
     return { success: true, order: data };
   } catch (error) {
     console.error('Error creating order:', error);

@@ -8,6 +8,7 @@ import {
 import { motion } from 'framer-motion';
 import VintageOrnament from '../components/VintageOrnament';
 import { getCurrentUser, updateProfile, changePassword, signOut, isAuthenticated, hasPasswordSet } from '../utils/auth';
+import { getOrdersByEmail } from '../utils/supabaseOrders';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -39,14 +40,29 @@ const Profile = () => {
     return currentUser?.addresses || [];
   });
 
-  const [orders, setOrders] = useState(() => {
-    return JSON.parse(localStorage.getItem('revieree_orders') || '[]');
-  });
+  const [orders, setOrders] = useState([]);
 
   const [hasPassword, setHasPassword] = useState(() => {
     const currentUser = getCurrentUser();
     return currentUser ? hasPasswordSet(currentUser.id) : false;
   });
+
+  // Load orders from Supabase
+  useEffect(() => {
+    const loadOrders = async () => {
+      const currentUser = getCurrentUser();
+      if (currentUser && currentUser.email) {
+        try {
+          const userOrders = await getOrdersByEmail(currentUser.email);
+          setOrders(userOrders || []);
+        } catch (error) {
+          console.error('Error loading orders:', error);
+          setOrders([]);
+        }
+      }
+    };
+    loadOrders();
+  }, []);
 
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
   const [selectedPaymentType, setSelectedPaymentType] = useState(null);
@@ -392,8 +408,8 @@ const Profile = () => {
                       <div key={order.id} className="border border-gray-200 rounded-lg p-4">
                         <div className="flex justify-between items-start mb-4">
                           <div>
-                            <p className="font-medium text-gray-900">Order #{order.id}</p>
-                            <p className="text-sm text-gray-500">{new Date(order.date).toLocaleDateString('en-IN')}</p>
+                            <p className="font-medium text-gray-900">Order #{order.order_number || order.id}</p>
+                            <p className="text-sm text-gray-500">{new Date(order.created_at || order.date).toLocaleDateString('en-IN')}</p>
                           </div>
                           <span className={`px-3 py-1 rounded-full text-sm ${
                             order.status === 'Delivered' ? 'bg-green-100 text-green-800' :
@@ -415,7 +431,7 @@ const Profile = () => {
                           ))}
                         </div>
                         <div className="mt-4 pt-4 border-t flex justify-between">
-                          <span className="font-medium">Total: ₹{order.total?.toLocaleString('en-IN')}</span>
+                          <span className="font-medium">Total: ₹{order.total_amount || order.total?.toLocaleString('en-IN')}</span>
                           <button className="text-red-700 hover:underline">View Details</button>
                         </div>
                       </div>
