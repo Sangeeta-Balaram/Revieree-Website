@@ -1,8 +1,9 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/((?!assets|perfumes|favicon.png|vite.svg).*)",
-      "destination": "/index.html"
+      "src": "/[^.]+",
+      "dest": "/",
+      "status": 200
     }
   ]
 }
