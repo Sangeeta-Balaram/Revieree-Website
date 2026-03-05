@@ -827,7 +827,7 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-[100vh] min-h-[700px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[100vh] min-h-[700px] flex items-center justify-center overflow-hidden pt-16 lg:pt-0">
         {/* Background Image */}
         <img
           src="/assets/images/adc8fc81eac678aba089250ca3074d47.jpg"
@@ -1011,7 +1011,10 @@ const Home = () => {
                       <p className="text-sm leading-relaxed mb-4 opacity-90">
                         {mood.liner}
                       </p>
-                      <Link to="/products" className="bg-white text-red-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-50 transition-colors transform hover:scale-105 inline-block">
+                      <Link
+                        to="/products"
+                        className="bg-white text-red-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-50 transition-colors transform hover:scale-105 inline-block"
+                      >
                         Shop {mood.title.toLowerCase()} vibes
                       </Link>
                     </div>
@@ -1194,7 +1197,10 @@ const Home = () => {
 
                       {/* Bottom part - CTA Button */}
                       <div className="h-1/2 flex items-center justify-center">
-                        <Link to="/products" className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block">
+                        <Link
+                          to="/products"
+                          className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block"
+                        >
                           Shop Now
                         </Link>
                       </div>
@@ -1244,7 +1250,9 @@ const Home = () => {
                     key={`duplicate-${index}`}
                     className="flex-shrink-0 w-[450px] h-[400px] relative group cursor-pointer border-2 border-red-200 rounded-2xl overflow-hidden"
                     onClick={() => {
-                      const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
+                      const productSlug = product.name
+                        .toLowerCase()
+                        .replace(/\s+/g, "-");
                       window.location.href = `/product/fragrance/${productSlug}`;
                     }}
                   >
@@ -1273,7 +1281,10 @@ const Home = () => {
 
                       {/* Bottom part - CTA Button */}
                       <div className="h-1/2 flex items-center justify-center">
-                        <Link to="/products" className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block">
+                        <Link
+                          to="/products"
+                          className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block"
+                        >
                           Shop Now
                         </Link>
                       </div>
@@ -1330,7 +1341,9 @@ const Home = () => {
                     key={index}
                     className="flex-shrink-0 w-[450px] h-[400px] relative group cursor-pointer border-2 border-red-200 rounded-2xl overflow-hidden"
                     onClick={() => {
-                      const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
+                      const productSlug = product.name
+                        .toLowerCase()
+                        .replace(/\s+/g, "-");
                       window.location.href = `/product/cosmetic/${productSlug}`;
                     }}
                   >
@@ -1359,7 +1372,10 @@ const Home = () => {
 
                       {/* Bottom part - CTA Button */}
                       <div className="h-1/2 flex items-center justify-center">
-                        <Link to="/products" className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block">
+                        <Link
+                          to="/products"
+                          className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block"
+                        >
                           Shop Now
                         </Link>
                       </div>
@@ -1409,7 +1425,9 @@ const Home = () => {
                     key={`duplicate-${index}`}
                     className="flex-shrink-0 w-[450px] h-[400px] relative group cursor-pointer border-2 border-red-200 rounded-2xl overflow-hidden"
                     onClick={() => {
-                      const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
+                      const productSlug = product.name
+                        .toLowerCase()
+                        .replace(/\s+/g, "-");
                       window.location.href = `/product/cosmetic/${productSlug}`;
                     }}
                   >
@@ -1438,7 +1456,10 @@ const Home = () => {
 
                       {/* Bottom part - CTA Button */}
                       <div className="h-1/2 flex items-center justify-center">
-                        <Link to="/products" className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block">
+                        <Link
+                          to="/products"
+                          className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block"
+                        >
                           Shop Now
                         </Link>
                       </div>
@@ -1584,14 +1605,16 @@ const Home = () => {
               <div className="mb-8">
                 <div className="flex flex-wrap justify-center gap-6">
                   {layeringCombo.map((product, index) => (
-<div
-                    key={index}
-                    className="flex-shrink-0 w-[450px] h-[400px] relative group cursor-pointer border-2 border-red-200 rounded-2xl overflow-hidden"
-                    onClick={() => {
-                      const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
-                      window.location.href = `/product/fragrance/${productSlug}`;
-                    }}
-                  >
+                    <div
+                      key={index}
+                      className="flex-shrink-0 w-[450px] h-[400px] relative group cursor-pointer border-2 border-red-200 rounded-2xl overflow-hidden"
+                      onClick={() => {
+                        const productSlug = product.name
+                          .toLowerCase()
+                          .replace(/\s+/g, "-");
+                        window.location.href = `/product/fragrance/${productSlug}`;
+                      }}
+                    >
                       <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-red-50 to-pink-50">
                         <img
                           src={product.image}
