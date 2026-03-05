@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingBag, Heart, ChevronDown, User, LogOut, Search } from "lucide-react";
+import {
+  Menu,
+  X,
+  ShoppingBag,
+  Heart,
+  ChevronDown,
+  User,
+  LogOut,
+  Search,
+} from "lucide-react";
 import logoRed from "../assets/images/logo-no-bg-for-red-bg.png";
 import logoWhite from "../assets/images/revieree-logo-no-bg.png";
 import { getCartItemCount } from "../utils/cart";
@@ -11,6 +20,7 @@ const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isDarkSection, setIsDarkSection] = useState(false);
   const [productsDropdown, setProductsDropdown] = useState(false);
+  const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
@@ -20,13 +30,13 @@ const Navigation = () => {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (productsDropdown && !event.target.closest('.products-dropdown')) {
+      if (productsDropdown && !event.target.closest(".products-dropdown")) {
         setProductsDropdown(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [productsDropdown]);
 
   useEffect(() => {
@@ -39,12 +49,10 @@ const Navigation = () => {
 
       sections.forEach((section) => {
         const rect = section.getBoundingClientRect();
-        const navPosition = 50; // Approximate navbar position from top
+        const navPosition = 50;
 
-        // Check if navbar overlaps with this section
         if (rect.top <= navPosition && rect.bottom >= navPosition) {
           const bgClasses = section.className;
-          // Check for dark backgrounds (red-800, red-900, red-950, purple, rose-900, etc.)
           if (
             bgClasses.includes("from-red-8") ||
             bgClasses.includes("to-red-8") ||
@@ -66,7 +74,7 @@ const Navigation = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Initial check
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -79,29 +87,24 @@ const Navigation = () => {
 
     updateData();
 
-    const handleStorageChange = () => {
-      updateData();
-    };
+    const handleStorageChange = () => updateData();
+    const handleUserLoggedIn = () => updateData();
 
-    const handleUserLoggedIn = () => {
-      updateData();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('cartUpdated', handleStorageChange);
-    window.addEventListener('userLoggedIn', handleUserLoggedIn);
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("cartUpdated", handleStorageChange);
+    window.addEventListener("userLoggedIn", handleUserLoggedIn);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('cartUpdated', handleStorageChange);
-      window.removeEventListener('userLoggedIn', handleUserLoggedIn);
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("cartUpdated", handleStorageChange);
+      window.removeEventListener("userLoggedIn", handleUserLoggedIn);
     };
   }, []);
 
   const handleSignOut = () => {
     signOut();
     setCurrentUser(null);
-    navigate('/');
+    navigate("/");
   };
 
   const leftNavLinks = [
@@ -120,29 +123,34 @@ const Navigation = () => {
 
   return (
     <>
-
-      {/* Mobile Top Bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-rose-950 to-red-900 z-50 px-4 py-3 flex items-center justify-between" style={{ height: '56px' }}>
+      {/* Mobile/Tablet Top Bar - show on screens smaller than lg (1024px) */}
+      <div
+        className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-rose-950 to-red-900 z-50 px-4 py-3 flex items-center justify-between"
+        style={{ height: "56px" }}
+      >
         {/* Hamburger Menu */}
         <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="text-white"
+          onClick={() => {
+            setIsOpen(!isOpen);
+            setMobileProductsOpen(false);
+          }}
+          className="text-white p-2 -ml-2"
         >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
+          {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
 
         {/* Logo - Mobile */}
-        <Link to="/" className="h-8">
+        <Link to="/" className="h-10">
           <img src={logoWhite} alt="Revieree" className="h-full w-auto" />
         </Link>
 
         {/* Right Icons - Mobile */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-5 pr-2">
           <Link to="/cart" className="text-white relative">
-            <ShoppingBag size={20} />
+            <ShoppingBag size={24} />
             {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                {cartCount > 99 ? '99+' : cartCount}
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                {cartCount > 99 ? "99+" : cartCount}
               </span>
             )}
           </Link>
@@ -150,37 +158,60 @@ const Navigation = () => {
       </div>
 
       {/* Mobile Menu - Full screen overlay */}
-      <div className={`md:hidden fixed inset-0 bg-white z-40 ${isOpen ? 'block' : 'hidden'}`} style={{ top: '56px' }}>
-        <div className="py-4 overflow-y-auto h-full">
-          <div className="space-y-1">
+      <div
+        className={`lg:hidden fixed inset-0 bg-white z-40 ${
+          isOpen ? "block" : "hidden"
+        }`}
+        style={{ top: "56px" }}
+      >
+        <div className="py-6 px-4 overflow-y-auto h-full">
+          <div className="space-y-2 mb-6">
             {navLinks.map((link) => (
               <div key={link.name}>
                 {link.hasDropdown ? (
-                  <div>
-                    <div className={`block py-3 px-6 text-red-800 font-medium ${
-                      location.pathname.startsWith("/products") ? "text-red-900" : ""
-                    }`}>
-                      {link.name}
-                    </div>
-                    <div className="ml-4 space-y-1">
-                      {productsDropdownItems.map((item) => (
-                        <Link
-                          key={item.path}
-                          to={item.path}
-                          className={`block py-2 px-6 text-red-700 font-medium text-sm ${
-                            location.pathname === item.path ? "text-red-900" : ""
-                          }`}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
-                    </div>
+                  <div className="border-b border-gray-100 pb-2">
+                    <button
+                      onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
+                      className={`w-full flex items-center justify-between py-4 px-4 text-red-800 font-semibold text-lg ${
+                        location.pathname.startsWith("/products")
+                          ? "text-red-900"
+                          : ""
+                      }`}
+                    >
+                      <span>{link.name}</span>
+                      <ChevronDown
+                        size={18}
+                        className={`transform transition-transform duration-200 ${
+                          mobileProductsOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                    {mobileProductsOpen && (
+                      <div className="ml-4 space-y-1">
+                        {productsDropdownItems.map((item) => (
+                          <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`block py-3 px-4 text-red-700 font-medium text-base ${
+                              location.pathname === item.path
+                                ? "text-red-900 bg-red-50"
+                                : ""
+                            }`}
+                            onClick={() => {
+                              setIsOpen(false);
+                              setMobileProductsOpen(false);
+                            }}
+                          >
+                            {item.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <Link
                     to={link.path}
-                    className={`block py-3 px-6 text-red-800 hover:text-red-900 font-medium ${
+                    className={`block py-4 px-4 text-red-800 hover:text-red-900 font-semibold text-lg ${
                       location.pathname === link.path ? "bg-red-50" : ""
                     }`}
                     onClick={() => setIsOpen(false)}
@@ -191,39 +222,55 @@ const Navigation = () => {
               </div>
             ))}
           </div>
-          
-          <div className="pt-4 border-t border-gray-200 mt-4">
-            <div className="flex justify-around py-4">
-              <Link to="/cart" className="flex flex-col items-center text-gray-700" onClick={() => setIsOpen(false)}>
-                <ShoppingBag size={20} />
-                <span className="text-xs mt-1">Cart</span>
+
+          <div className="pt-6 border-t border-gray-200 mt-4">
+            <div className="flex justify-around py-6">
+              <Link
+                to="/cart"
+                className="flex flex-col items-center text-gray-700"
+                onClick={() => setIsOpen(false)}
+              >
+                <ShoppingBag size={28} />
+                <span className="text-sm mt-2 font-medium">Cart</span>
               </Link>
-              <Link to="/wishlist" className="flex flex-col items-center text-gray-700" onClick={() => setIsOpen(false)}>
-                <Heart size={20} />
-                <span className="text-xs mt-1">Wishlist</span>
+              <Link
+                to="/wishlist"
+                className="flex flex-col items-center text-gray-700"
+                onClick={() => setIsOpen(false)}
+              >
+                <Heart size={28} />
+                <span className="text-sm mt-2 font-medium">Wishlist</span>
               </Link>
               {currentUser ? (
-                <Link to="/profile" className="flex flex-col items-center text-gray-700" onClick={() => setIsOpen(false)}>
-                  <User size={20} />
-                  <span className="text-xs mt-1">Profile</span>
+                <Link
+                  to="/profile"
+                  className="flex flex-col items-center text-gray-700"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <User size={28} />
+                  <span className="text-sm mt-2 font-medium">Profile</span>
                 </Link>
               ) : (
-                <Link to="/login" className="flex flex-col items-center text-gray-700" onClick={() => setIsOpen(false)}>
-                  <User size={20} />
-                  <span className="text-xs mt-1">Login</span>
+                <Link
+                  to="/login"
+                  className="flex flex-col items-center text-gray-700"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <User size={28} />
+                  <span className="text-sm mt-2 font-medium">Login</span>
                 </Link>
               )}
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Spacer for desktop floating navbar */}
-      <div className="hidden md:block h-20"></div>
 
-      {/* Desktop Floating Navbar */}
+      {/* Spacer for mobile/tablet top bar */}
+      <div className="lg:hidden h-14"></div>
+
+      {/* Desktop Floating Navbar - Only show on lg (1024px+) screens */}
       <nav
-        className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 hidden md:block ${
+        className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 hidden lg:block ${
           isDarkSection
             ? "bg-white border border-red-200 px-8 py-2 rounded-full shadow-lg"
             : "bg-gradient-to-r from-rose-950 to-red-900 px-8 py-2 rounded-full shadow-lg"
@@ -231,7 +278,7 @@ const Navigation = () => {
       >
         <div className="flex items-center justify-between w-full min-w-[850px]">
           {/* Left Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden lg:flex items-center space-x-6">
             {leftNavLinks.map((link) => (
               <div key={link.name} className="relative z-50">
                 {link.hasDropdown ? (
@@ -249,10 +296,10 @@ const Navigation = () => {
                       }`}
                     >
                       <span>{link.name}</span>
-                      <ChevronDown 
-                        size={14} 
+                      <ChevronDown
+                        size={14}
                         className={`transform transition-transform duration-200 ${
-                          productsDropdown ? 'rotate-180' : ''
+                          productsDropdown ? "rotate-180" : ""
                         }`}
                       />
                     </button>
@@ -280,13 +327,14 @@ const Navigation = () => {
                     to={link.path}
                     className={`text-sm transition-colors font-medium px-3 py-1 rounded-full ${
                       (link.path === "/" && location.pathname === "/") ||
-                      (link.path !== "/" && location.pathname.startsWith(link.path))
+                      (link.path !== "/" &&
+                        location.pathname.startsWith(link.path))
                         ? isDarkSection
                           ? "bg-red-800 text-white"
                           : "bg-white text-red-800"
                         : isDarkSection
-                          ? "text-red-800 hover:text-red-900"
-                          : "text-white hover:text-red-100"
+                        ? "text-red-800 hover:text-red-900"
+                        : "text-white hover:text-red-100"
                     }`}
                   >
                     {link.name}
@@ -309,7 +357,7 @@ const Navigation = () => {
           </Link>
 
           {/* Right Side - Desktop Only */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden lg:flex items-center space-x-6">
             <div className="relative">
               <Link
                 to="/cart"
@@ -322,7 +370,7 @@ const Navigation = () => {
                 <ShoppingBag size={18} />
                 {cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    {cartCount > 99 ? '99+' : cartCount}
+                    {cartCount > 99 ? "99+" : cartCount}
                   </span>
                 )}
               </Link>
@@ -344,7 +392,7 @@ const Navigation = () => {
                   className="flex items-center text-sm font-medium text-white transition-colors px-3 py-1.5 rounded-full bg-burgundy-700 hover:bg-burgundy-800"
                 >
                   <User size={16} className="mr-2" />
-                  Hi, {currentUser.name?.split(' ')[0] || 'User'}
+                  Hi, {currentUser.name?.split(" ")[0] || "User"}
                 </button>
                 {userDropdown && (
                   <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-[9999]">
@@ -391,156 +439,7 @@ const Navigation = () => {
               </Link>
             )}
           </div>
-
-          {/* Mobile Menu Button - Hamburger */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={`md:hidden p-2 transition-colors ${
-              isDarkSection ? "text-red-800" : "text-white"
-            }`}
-          >
-            {isOpen ? (
-              <X size={24} />
-            ) : (
-              <div className="space-y-1.5">
-                <span className="block w-6 h-0.5 bg-current"></span>
-                <span className="block w-6 h-0.5 bg-current"></span>
-                <span className="block w-6 h-0.5 bg-current"></span>
-              </div>
-            )}
-          </button>
         </div>
-
-        {/* Mobile Menu */}
-        {isOpen && (
-          <div className="md:hidden fixed top-20 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-lg z-40">
-            <div className="py-4 space-y-3">
-              {navLinks.map((link) => (
-                <div key={link.name}>
-                  {link.hasDropdown ? (
-                    <div>
-                      <div className={`block py-2 px-6 text-red-800 font-medium ${
-                        location.pathname.startsWith("/products") ? "text-red-900" : ""
-                      }`}>
-                        {link.name}
-                      </div>
-                      <div className="ml-4 space-y-2">
-                        {productsDropdownItems.map((item) => (
-                          <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`block py-2 px-6 text-red-700 hover:text-red-900 font-medium text-sm ${
-                              location.pathname === item.path ? "text-red-900" : ""
-                            }`}
-                            onClick={() => setIsOpen(false)}
-                          >
-                            {item.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <Link
-                      to={link.path}
-                      className={`block py-2 px-6 text-red-800 hover:text-red-900 font-medium ${
-                        location.pathname === link.path ? "text-red-900" : ""
-                      }`}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {link.name}
-                    </Link>
-                  )}
-                </div>
-              ))}
-              <div className="pt-4 border-t border-gray-200 px-6 space-y-3">
-                {currentUser ? (
-                  <>
-                    <div className="flex items-center space-x-3 py-2">
-                      {currentUser.picture ? (
-                        <img 
-                          src={currentUser.picture} 
-                          alt={currentUser.name}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                          <User size={20} className="text-red-800" />
-                        </div>
-                      )}
-                      <div>
-                        <p className="font-medium text-gray-900">Hi, {currentUser.name}</p>
-                        <p className="text-sm text-gray-500">{currentUser.email}</p>
-                      </div>
-                    </div>
-                    <Link
-                      to="/profile"
-                      className="block text-red-800 hover:text-red-900 font-medium"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      My Profile
-                    </Link>
-                    <button
-                      onClick={() => {
-                        setIsOpen(false);
-                        handleSignOut();
-                      }}
-                      className="block text-red-800 hover:text-red-900 font-medium"
-                    >
-                      Sign Out
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      className="block text-red-800 hover:text-red-900 font-medium"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Sign in
-                    </Link>
-                    <Link
-                      to="/signup"
-                      className="block py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-center"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Get started
-                    </Link>
-                  </>
-                )}
-              </div>
-
-              {/* Mobile Menu - Quick Links (Cart, Wishlist) */}
-              <div className="pt-4 border-t border-gray-200 px-6 pb-4">
-                <div className="flex justify-around">
-                  <Link
-                    to="/cart"
-                    className="flex flex-col items-center text-gray-700"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <ShoppingBag size={20} />
-                    <span className="text-xs mt-1">Cart</span>
-                  </Link>
-                  <Link
-                    to="/wishlist"
-                    className="flex flex-col items-center text-gray-700"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Heart size={20} />
-                    <span className="text-xs mt-1">Wishlist</span>
-                  </Link>
-                  <Link
-                    to="/search"
-                    className="flex flex-col items-center text-gray-700"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Search size={20} />
-                    <span className="text-xs mt-1">Search</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </nav>
     </>
   );
