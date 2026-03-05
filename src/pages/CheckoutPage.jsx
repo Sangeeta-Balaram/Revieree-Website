@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { updateCartQuantity, removeFromCart } from "../utils/cart";
 import { createOrder, PAYMENT_METHODS, PAYMENT_STATUS } from "../utils/supabaseOrders";
-import { getCurrentUser } from "../utils/auth";
+import { getCurrentUser, updateProfile } from "../utils/auth";
 import heroBgImg from "../assets/images/adc8fc81eac678aba089250ca3074d47.jpg";
 
 const CheckoutPage = () => {
@@ -141,7 +141,7 @@ const CheckoutPage = () => {
     savePayment: false,
   }));
 
-  // Save to localStorage when form data changes
+  const [saveAddress, setSaveAddress] = useState(false);
   useEffect(() => {
     localStorage.setItem('checkout_shipping', JSON.stringify(shippingInfo));
   }, [shippingInfo]);
@@ -299,6 +299,22 @@ const CheckoutPage = () => {
 
         // Clear items state to update UI
         setItems([]);
+
+        // Save address to user profile if checked
+        if (saveAddress && currentUser) {
+          const newAddress = {
+            id: Date.now(),
+            type: 'Home',
+            fullName: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
+            address: shippingInfo.address,
+            city: shippingInfo.city,
+            state: shippingInfo.state,
+            pincode: shippingInfo.pincode,
+            phone: shippingInfo.phone,
+          };
+          const existingAddresses = currentUser.addresses || [];
+          updateProfile(currentUser.id, { addresses: [...existingAddresses, newAddress] });
+        }
 
         // Clear checkout form data
         localStorage.removeItem('checkout_shipping');
@@ -707,6 +723,22 @@ const CheckoutPage = () => {
                     Billing address same as shipping
                   </label>
                 </div>
+
+                {/* Save Address Checkbox */}
+                {currentUser && (
+                  <div className="flex items-center space-x-3 mb-6">
+                    <input
+                      type="checkbox"
+                      id="saveAddress"
+                      checked={saveAddress}
+                      onChange={(e) => setSaveAddress(e.target.checked)}
+                      className="w-5 h-5 text-red-800 border-red-800 rounded focus:ring-red-800"
+                    />
+                    <label htmlFor="saveAddress" className="text-sm font-medium text-gray-700">
+                      Save this address for future orders
+                    </label>
+                  </div>
+                )}
 
                 <button
                   onClick={handleNextStep}
