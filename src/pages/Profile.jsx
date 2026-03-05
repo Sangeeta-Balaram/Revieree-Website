@@ -41,6 +41,7 @@ const Profile = () => {
   });
 
   const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   const [hasPassword, setHasPassword] = useState(() => {
     const currentUser = getCurrentUser();
@@ -436,12 +437,116 @@ const Profile = () => {
                         </div>
                         <div className="mt-4 pt-4 border-t flex justify-between">
                           <span className="font-medium">Total: ₹{order.total_amount || order.total?.toLocaleString('en-IN')}</span>
-                          <button className="text-red-700 hover:underline">View Details</button>
+                          <button 
+                            onClick={() => setSelectedOrder(order)}
+                            className="text-red-700 hover:underline"
+                          >
+                            View Details
+                          </button>
                         </div>
                       </div>
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Order Details Modal */}
+            {selectedOrder && (
+              <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        Order #{selectedOrder.order_number}
+                      </h2>
+                      <button 
+                        onClick={() => setSelectedOrder(null)}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-6">
+                      {/* Order Status */}
+                      <div className="flex justify-between items-center pb-4 border-b">
+                        <span className="text-gray-600">Status</span>
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          selectedOrder.status === 'Delivered' ? 'bg-green-100 text-green-800' :
+                          selectedOrder.status === 'Shipped' ? 'bg-purple-100 text-purple-800' :
+                          selectedOrder.status === 'Out for Delivery' ? 'bg-orange-100 text-orange-800' :
+                          selectedOrder.status === 'Processing' ? 'bg-blue-100 text-blue-800' :
+                          selectedOrder.status === 'Confirmed' ? 'bg-indigo-100 text-indigo-800' :
+                          selectedOrder.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {selectedOrder.status}
+                        </span>
+                      </div>
+
+                      {/* Order Items */}
+                      <div>
+                        <h3 className="font-semibold text-gray-900 mb-3">Items</h3>
+                        <div className="space-y-3">
+                          {selectedOrder.items?.map((item, idx) => (
+                            <div key={idx} className="flex items-center space-x-4">
+                              <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
+                              <div className="flex-1">
+                                <p className="font-medium">{item.name}</p>
+                                <p className="text-sm text-gray-500">
+                                  {item.variation || 'Standard'} • Qty: {item.quantity}
+                                </p>
+                              </div>
+                              <p className="font-medium">₹{item.price * item.quantity}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Shipping Address */}
+                      {selectedOrder.shipping_address && (
+                        <div>
+                          <h3 className="font-semibold text-gray-900 mb-3">Shipping Address</h3>
+                          <div className="bg-gray-50 p-4 rounded-lg">
+                            <p className="text-gray-700">
+                              {selectedOrder.shipping_address.firstName} {selectedOrder.shipping_address.lastName}
+                            </p>
+                            <p className="text-gray-600">{selectedOrder.shipping_address.street}</p>
+                            <p className="text-gray-600">
+                              {selectedOrder.shipping_address.city}, {selectedOrder.shipping_address.state} - {selectedOrder.shipping_address.pincode}
+                            </p>
+                            <p className="text-gray-600">{selectedOrder.shipping_address.phone}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Payment Info */}
+                      <div className="flex justify-between items-center py-4 border-t">
+                        <span className="text-gray-600">Payment Method</span>
+                        <span className="font-medium">{selectedOrder.payment_method || 'Cash on Delivery'}</span>
+                      </div>
+
+                      <div className="flex justify-between items-center py-4 border-t">
+                        <span className="text-gray-600">Payment Status</span>
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          selectedOrder.payment_status === 'Paid' ? 'bg-green-100 text-green-800' :
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {selectedOrder.payment_status || 'Unpaid'}
+                        </span>
+                      </div>
+
+                      {/* Order Total */}
+                      <div className="pt-4 border-t">
+                        <div className="flex justify-between text-lg font-bold">
+                          <span>Total</span>
+                          <span className="text-red-600">₹{selectedOrder.total_amount}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 

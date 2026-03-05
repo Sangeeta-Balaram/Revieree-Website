@@ -36,6 +36,7 @@ const CheckoutPage = () => {
   const [orderNumber, setOrderNumber] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isFetchingPincode, setIsFetchingPincode] = useState(false);
+  const [validationErrors, setValidationErrors] = useState([]);
   
   const indianStates = [
     "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -325,41 +326,44 @@ const CheckoutPage = () => {
   };
 
   const validateStep = (step) => {
+    const errors = [];
+    
     switch (step) {
       case 1:
         if (!shippingInfo.firstName || !shippingInfo.lastName) {
-          console.error('Validation failed: Name is required');
-          return false;
+          errors.push('Full name is required');
         }
         if (!shippingInfo.email || !validateEmail(shippingInfo.email)) {
-          console.error('Validation failed: Valid email is required');
-          return false;
+          errors.push('Please enter a valid email address');
         }
         if (!shippingInfo.phone || !validatePhone(shippingInfo.phone)) {
-          console.error('Validation failed: Valid 10-digit phone number is required');
-          return false;
+          errors.push('Please enter a valid 10-digit phone number');
         }
         if (!shippingInfo.address) {
-          console.error('Validation failed: Address is required');
-          return false;
+          errors.push('Please enter your shipping address');
         }
         if (!shippingInfo.city || !shippingInfo.state) {
-          console.error('Validation failed: City and state are required');
-          return false;
+          errors.push('Please select your city and state');
         }
         if (!shippingInfo.pincode || !validatePincode(shippingInfo.pincode)) {
-          console.error('Validation failed: Valid 6-digit PIN code is required');
+          errors.push('Please enter a valid 6-digit PIN code');
+        }
+        
+        setValidationErrors(errors);
+        
+        if (errors.length > 0) {
           return false;
         }
         return true;
       case 2:
-        return true; // Razorpay handles validation
+        return true;
       default:
         return true;
     }
   };
 
   const handleNextStep = () => {
+    setValidationErrors([]);
     if (validateStep(currentStep)) {
       setCurrentStep(prev => Math.min(prev + 1, 4));
     }
@@ -452,6 +456,27 @@ const CheckoutPage = () => {
       </div>
 
       <div className="container-custom py-8">
+        {/* Validation Errors */}
+        {validationErrors.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6"
+          >
+            <div className="flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-medium text-red-800">Please fix the following errors:</h3>
+                <ul className="mt-2 space-y-1">
+                  {validationErrors.map((error, idx) => (
+                    <li key={idx} className="text-sm text-red-700">• {error}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-4 md:space-x-8">
