@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingBag, Heart, ChevronDown, User, LogOut } from "lucide-react";
+import { Menu, X, ShoppingBag, Heart, ChevronDown, User, LogOut, Search } from "lucide-react";
 import logoRed from "../assets/images/logo-no-bg-for-red-bg.png";
 import logoWhite from "../assets/images/revieree-logo-no-bg.png";
 import { getCartItemCount } from "../utils/cart";
@@ -292,14 +292,22 @@ const Navigation = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - Hamburger */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`md:hidden p-1 transition-colors ${
+            className={`md:hidden p-2 transition-colors ${
               isDarkSection ? "text-red-800" : "text-white"
             }`}
           >
-            {isOpen ? <X size={18} /> : <Menu size={18} />}
+            {isOpen ? (
+              <X size={24} />
+            ) : (
+              <div className="space-y-1.5">
+                <span className="block w-6 h-0.5 bg-current"></span>
+                <span className="block w-6 h-0.5 bg-current"></span>
+                <span className="block w-6 h-0.5 bg-current"></span>
+              </div>
+            )}
           </button>
         </div>
 
@@ -400,10 +408,39 @@ const Navigation = () => {
                   </>
                 )}
               </div>
-            </div>
-          </div>
-        )}
-      </nav>
+
+              {/* Mobile Menu - Quick Links (Cart, Wishlist) */}
+              <div className="pt-4 border-t border-gray-200 px-6 pb-4">
+                <div className="flex justify-around">
+                  <Link
+                    to="/cart"
+                    className="flex flex-col items-center text-gray-700"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <ShoppingBag size={20} />
+                    <span className="text-xs mt-1">Cart</span>
+                  </Link>
+                  <Link
+                    to="/wishlist"
+                    className="flex flex-col items-center text-gray-700"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Heart size={20} />
+                    <span className="text-xs mt-1">Wishlist</span>
+                  </Link>
+                  <Link
+                    to="/search"
+                    className="flex flex-col items-center text-gray-700"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Search size={20} />
+                    <span className="text-xs mt-1">Search</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* User Section */}
+              <div className="pt-4 border-t border-gray-200 px-6 space-y-3">
     </>
   );
 };
