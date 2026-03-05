@@ -151,10 +151,13 @@ const Navigation = () => {
 
       {/* Spacer for mobile top bar */}
       <div className="md:hidden h-14"></div>
+      
+      {/* Spacer for desktop floating navbar */}
+      <div className="hidden md:block h-20"></div>
 
-      {/* Desktop Navbar */}
+      {/* Desktop Floating Navbar */}
       <nav
-        className={`hidden md:fixed top-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ${
+        className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 hidden md:block ${
           isDarkSection
             ? "bg-white border border-red-200 px-8 py-2 rounded-full shadow-lg"
             : "bg-gradient-to-r from-rose-950 to-red-900 px-8 py-2 rounded-full shadow-lg"
