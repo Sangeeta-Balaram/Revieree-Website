@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { updateCartQuantity, removeFromCart } from "../utils/cart";
 import { createOrder, PAYMENT_METHODS, PAYMENT_STATUS } from "../utils/supabaseOrders";
+import { getCurrentUser } from "../utils/auth";
 import heroBgImg from "../assets/images/adc8fc81eac678aba089250ca3074d47.jpg";
 
 const CheckoutPage = () => {
@@ -74,20 +75,51 @@ const CheckoutPage = () => {
     }
   };
   
-  // Form states
-  const [shippingInfo, setShippingInfo] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
+  // Get logged in user
+  const currentUser = getCurrentUser();
+  
+  // Get default values from user if logged in
+  const getUserDefaults = () => {
+    const user = getCurrentUser();
+    if (user) {
+      const nameParts = (user.name || '').split(' ');
+      return {
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+        email: user.email || '',
+      };
+    }
+    return { firstName: '', lastName: '', email: '' };
+  };
+  
+  const userDefaults = getUserDefaults();
+  
+  // Load from localStorage or use defaults
+  const getStoredData = (key, defaultValue) => {
+    try {
+      const stored = localStorage.getItem(`checkout_${key}`);
+      return stored ? JSON.parse(stored) : defaultValue;
+    } catch {
+      return defaultValue;
+    }
+  };
+
+  // Form states - load from localStorage, pre-fill with user data
+  const [shippingInfo, setShippingInfo] = useState(() => 
+    getStoredData('shipping', {
+    firstName: userDefaults.firstName,
+    lastName: userDefaults.lastName,
+    email: userDefaults.email,
     phone: "",
     address: "",
     city: "",
     state: "",
     pincode: "",
     country: "India",
-  });
+  }));
   
-  const [billingInfo, setBillingInfo] = useState({
+  const [billingInfo, setBillingInfo] = useState(() => 
+    getStoredData('billing', {
     sameAsShipping: true,
     firstName: "",
     lastName: "",
@@ -96,17 +128,38 @@ const CheckoutPage = () => {
     state: "",
     pincode: "",
     country: "India",
-  });
+  }));
   
-  const [paymentInfo, setPaymentInfo] = useState({
-    method: "cod", // cod, card, upi, wallet, razorpay
+  const [paymentInfo, setPaymentInfo] = useState(() => 
+    getStoredData('payment', {
+    method: "cod",
     cardNumber: "",
     cardName: "",
     expiryDate: "",
     cvv: "",
     upiId: "",
     savePayment: false,
-  });
+  }));
+
+  // Save to localStorage when form data changes
+  useEffect(() => {
+    localStorage.setItem('checkout_shipping', JSON.stringify(shippingInfo));
+  }, [shippingInfo]);
+
+  useEffect(() => {
+    localStorage.setItem('checkout_billing', JSON.stringify(billingInfo));
+  }, [billingInfo]);
+
+  useEffect(() => {
+    localStorage.setItem('checkout_payment', JSON.stringify(paymentInfo));
+  }, [paymentInfo]);
+
+  // Clear checkout data from localStorage after successful order
+  const clearCheckoutData = () => {
+    localStorage.removeItem('checkout_shipping');
+    localStorage.removeItem('checkout_billing');
+    localStorage.removeItem('checkout_payment');
+  };
 
   // Razorpay configuration - Replace with your LIVE key when ready for production
   const RAZORPAY_KEY_ID = "rzp_test_SMmWQVteSJqyUm"; // TODO: Replace with rzp_live_XXXXX for production
@@ -246,6 +299,11 @@ const CheckoutPage = () => {
 
         // Clear items state to update UI
         setItems([]);
+
+        // Clear checkout form data
+        localStorage.removeItem('checkout_shipping');
+        localStorage.removeItem('checkout_billing');
+        localStorage.removeItem('checkout_payment');
 
         setOrderComplete(true);
       } else {
