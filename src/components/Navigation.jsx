@@ -151,6 +151,75 @@ const Navigation = () => {
 
       {/* Spacer for mobile top bar */}
       <div className="md:hidden h-14"></div>
+
+      {/* Mobile Menu - Show when isOpen is true */}
+      <div className={`md:hidden fixed inset-0 top-14 bg-white z-40 ${isOpen ? 'block' : 'hidden'}`}>
+        <div className="py-4 overflow-y-auto h-full">
+          <div className="space-y-1">
+            {navLinks.map((link) => (
+              <div key={link.name}>
+                {link.hasDropdown ? (
+                  <div>
+                    <div className={`block py-3 px-6 text-red-800 font-medium ${
+                      location.pathname.startsWith("/products") ? "text-red-900" : ""
+                    }`}>
+                      {link.name}
+                    </div>
+                    <div className="ml-4 space-y-1">
+                      {productsDropdownItems.map((item) => (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          className={`block py-2 px-6 text-red-700 font-medium text-sm ${
+                            location.pathname === item.path ? "text-red-900" : ""
+                          }`}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <Link
+                    to={link.path}
+                    className={`block py-3 px-6 text-red-800 hover:text-red-900 font-medium ${
+                      location.pathname === link.path ? "bg-red-50" : ""
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+          
+          <div className="pt-4 border-t border-gray-200 mt-4">
+            <div className="flex justify-around py-4">
+              <Link to="/cart" className="flex flex-col items-center text-gray-700" onClick={() => setIsOpen(false)}>
+                <ShoppingBag size={20} />
+                <span className="text-xs mt-1">Cart</span>
+              </Link>
+              <Link to="/wishlist" className="flex flex-col items-center text-gray-700" onClick={() => setIsOpen(false)}>
+                <Heart size={20} />
+                <span className="text-xs mt-1">Wishlist</span>
+              </Link>
+              {currentUser ? (
+                <Link to="/profile" className="flex flex-col items-center text-gray-700" onClick={() => setIsOpen(false)}>
+                  <User size={20} />
+                  <span className="text-xs mt-1">Profile</span>
+                </Link>
+              ) : (
+                <Link to="/login" className="flex flex-col items-center text-gray-700" onClick={() => setIsOpen(false)}>
+                  <User size={20} />
+                  <span className="text-xs mt-1">Login</span>
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
       
       {/* Spacer for desktop floating navbar */}
       <div className="hidden md:block h-20"></div>
