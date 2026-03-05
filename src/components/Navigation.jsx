@@ -122,7 +122,7 @@ const Navigation = () => {
     <>
 
       {/* Mobile Top Bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-rose-950 to-red-900 z-50 px-4 py-3 flex items-center justify-between">
+      <div className="md:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-rose-950 to-red-900 z-50 px-4 py-3 flex items-center justify-between" style={{ height: '56px' }}>
         {/* Hamburger Menu */}
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -149,11 +149,8 @@ const Navigation = () => {
         </div>
       </div>
 
-      {/* Spacer for mobile top bar */}
-      <div className="md:hidden h-14"></div>
-
-      {/* Mobile Menu - Show when isOpen is true */}
-      <div className={`md:hidden fixed inset-0 top-14 bg-white z-40 ${isOpen ? 'block' : 'hidden'}`}>
+      {/* Mobile Menu - Full screen overlay */}
+      <div className={`md:hidden fixed inset-0 bg-white z-40 ${isOpen ? 'block' : 'hidden'}`} style={{ top: '56px' }}>
         <div className="py-4 overflow-y-auto h-full">
           <div className="space-y-1">
             {navLinks.map((link) => (
