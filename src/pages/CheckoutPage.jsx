@@ -23,7 +23,7 @@ import {
   Package,
 } from "lucide-react";
 import { updateCartQuantity, removeFromCart } from "../utils/cart";
-import { createOrder, PAYMENT_METHODS, PAYMENT_STATUS } from "../utils/supabaseOrders";
+import { createOrder, PAYMENT_METHODS, PAYMENT_STATUS, validateCoupon } from "../utils/supabaseOrders";
 import { getCurrentUser, updateProfile } from "../utils/auth";
 import heroBgImg from "../assets/images/adc8fc81eac678aba089250ca3074d47.jpg";
 
@@ -142,6 +142,10 @@ const CheckoutPage = () => {
   }));
 
   const [saveAddress, setSaveAddress] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponApplied, setCouponApplied] = useState(null);
+  const [couponError, setCouponError] = useState('');
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   useEffect(() => {
     localStorage.setItem('checkout_shipping', JSON.stringify(shippingInfo));
   }, [shippingInfo]);
@@ -364,7 +368,39 @@ const CheckoutPage = () => {
   };
 
   const getTotal = () => {
-    return getSubtotal() + getShipping();
+    let total = getSubtotal() + getShipping();
+    if (couponApplied) {
+      total = total - couponApplied.discountAmount;
+    }
+    return total > 0 ? total : 0;
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+    setIsApplyingCoupon(true);
+    setCouponError('');
+    try {
+      const result = await validateCoupon(couponCode, getSubtotal() + getShipping());
+      if (result.success) {
+        setCouponApplied(result);
+        setSuccessMessage(result.message);
+      } else {
+        setCouponError(result.error);
+      }
+    } catch (error) {
+      setCouponError('Failed to apply coupon');
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponApplied(null);
+    setCouponCode('');
+    setCouponError('');
   };
 
   const handleQuantityChange = (productId, newQuantity) => {
@@ -938,11 +974,56 @@ const CheckoutPage = () => {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 sticky top-24">
               <h3 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h3>
               
+              {/* Coupon Input */}
+              {!couponApplied ? (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Have a coupon?</label>
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      placeholder="Enter coupon code"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-red-800"
+                    />
+                    <button
+                      onClick={handleApplyCoupon}
+                      disabled={isApplyingCoupon}
+                      className="px-4 py-2 bg-burgundy-700 text-white rounded-lg text-sm hover:bg-red-800 disabled:bg-gray-400"
+                    >
+                      {isApplyingCoupon ? 'Applying...' : 'Apply'}
+                    </button>
+                  </div>
+                  {couponError && <p className="text-red-500 text-xs mt-1">{couponError}</p>}
+                </div>
+              ) : (
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-green-700 font-medium text-sm">{couponApplied.coupon.code}</p>
+                      <p className="text-green-600 text-xs">You save ₹{couponApplied.discountAmount}</p>
+                    </div>
+                    <button
+                      onClick={handleRemoveCoupon}
+                      className="text-red-500 text-sm hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
                   <span className="font-medium">{formatPrice(getSubtotal())}</span>
                 </div>
+                {couponApplied && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount</span>
+                    <span className="font-medium">-₹{couponApplied.discountAmount}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
                   {getShipping() === 0 ? (

@@ -8,7 +8,7 @@ import {
 import { motion } from 'framer-motion';
 import VintageOrnament from '../components/VintageOrnament';
 import { getCurrentUser, updateProfile, changePassword, signOut, isAuthenticated, hasPasswordSet } from '../utils/auth';
-import { getOrdersByEmail } from '../utils/supabaseOrders';
+import { getOrdersByEmail, cancelOrder, updatePaymentMethod } from '../utils/supabaseOrders';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -42,6 +42,9 @@ const Profile = () => {
 
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
 
   const [hasPassword, setHasPassword] = useState(() => {
     const currentUser = getCurrentUser();
@@ -64,6 +67,53 @@ const Profile = () => {
     };
     loadOrders();
   }, []);
+
+  const handleCancelOrder = async () => {
+    if (!selectedOrder) return;
+    setIsCancelling(true);
+    try {
+      const result = await cancelOrder(selectedOrder.id, 'Cancelled by customer');
+      if (result.success) {
+        setSuccessMessage('Order cancelled successfully');
+        setShowCancelConfirm(false);
+        // Reload orders
+        const currentUser = getCurrentUser();
+        if (currentUser && currentUser.email) {
+          const userOrders = await getOrdersByEmail(currentUser.email);
+          setOrders(userOrders || []);
+        }
+        setSelectedOrder(null);
+      } else {
+        setErrorMessage(result.error || 'Failed to cancel order');
+      }
+    } catch (error) {
+      setErrorMessage('Error cancelling order');
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  const handleChangePayment = async (newMethod) => {
+    if (!selectedOrder) return;
+    try {
+      const result = await updatePaymentMethod(selectedOrder.id, newMethod);
+      if (result.success) {
+        setSuccessMessage('Payment method updated successfully');
+        setShowPaymentOptions(false);
+        // Reload orders
+        const currentUser = getCurrentUser();
+        if (currentUser && currentUser.email) {
+          const userOrders = await getOrdersByEmail(currentUser.email);
+          setOrders(userOrders || []);
+        }
+        setSelectedOrder(null);
+      } else {
+        setErrorMessage(result.error || 'Failed to update payment method');
+      }
+    } catch (error) {
+      setErrorMessage('Error updating payment method');
+    }
+  };
 
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
   const [selectedPaymentType, setSelectedPaymentType] = useState(null);
@@ -265,14 +315,14 @@ const Profile = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
           <div className="lg:w-72 flex-shrink-0">
-            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">My Account</h2>
-              <nav className="space-y-2">
+            <div className="bg-white rounded-2xl shadow-lg p-4 lg:p-6 sticky top-20 lg:top-24 z-40 overflow-x-auto">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 lg:mb-6 hidden lg:block">My Account</h2>
+              <nav className="space-y-2 flex lg:block overflow-x-auto whitespace-nowrap -mx-4 px-4 lg:mx-0 lg:px-0">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors whitespace-nowrap ${
+                    className={`inline-flex lg:flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'bg-burgundy-700 text-white font-medium'
                         : 'text-gray-600 hover:bg-gray-50'
@@ -544,8 +594,92 @@ const Profile = () => {
                           <span className="text-red-600">₹{selectedOrder.total_amount}</span>
                         </div>
                       </div>
+
+                      {/* Action Buttons */}
+                      <div className="mt-4 space-y-2">
+                        {/* Cancel Order Button - Only for Pending/Confirmed */}
+                        {(selectedOrder.status === 'Pending' || selectedOrder.status === 'Confirmed') && (
+                          <button
+                            onClick={() => setShowCancelConfirm(true)}
+                            className="w-full py-2 px-4 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
+                          >
+                            Cancel Order
+                          </button>
+                        )}
+
+                        {/* Change Payment Method - Only for COD */}
+                        {(selectedOrder.payment_method === 'Cash on Delivery' || selectedOrder.payment_method === 'COD') && 
+                         (selectedOrder.status === 'Pending' || selectedOrder.status === 'Confirmed') && (
+                          <button
+                            onClick={() => setShowPaymentOptions(true)}
+                            className="w-full py-2 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            Change Payment Method
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Cancel Confirmation Modal */}
+            {showCancelConfirm && selectedOrder && (
+              <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl max-w-md w-full p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Cancel Order?</h3>
+                  <p className="text-gray-600 mb-6">Are you sure you want to cancel this order? This action cannot be undone.</p>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => setShowCancelConfirm(false)}
+                      className="flex-1 py-2 border border-gray-300 rounded-lg"
+                    >
+                      No, Keep Order
+                    </button>
+                    <button
+                      onClick={handleCancelOrder}
+                      disabled={isCancelling}
+                      className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400"
+                    >
+                      {isCancelling ? 'Cancelling...' : 'Yes, Cancel Order'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Payment Method Options Modal */}
+            {showPaymentOptions && selectedOrder && (
+              <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl max-w-md w-full p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Select Payment Method</h3>
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => handleChangePayment('UPI')}
+                      className="w-full p-4 border border-gray-200 rounded-lg hover:border-burgundy-700 text-left"
+                    >
+                      <span className="font-medium">UPI Payment</span>
+                    </button>
+                    <button
+                      onClick={() => handleChangePayment('Credit/Debit Card')}
+                      className="w-full p-4 border border-gray-200 rounded-lg hover:border-burgundy-700 text-left"
+                    >
+                      <span className="font-medium">Credit / Debit Card</span>
+                    </button>
+                    <button
+                      onClick={() => handleChangePayment('Wallet')}
+                      className="w-full p-4 border border-gray-200 rounded-lg hover:border-burgundy-700 text-left"
+                    >
+                      <span className="font-medium">Wallet</span>
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setShowPaymentOptions(false)}
+                    className="w-full mt-4 py-2 border border-gray-300 rounded-lg"
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
             )}

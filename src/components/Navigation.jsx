@@ -133,7 +133,7 @@ const Navigation = () => {
           {/* Left Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             {leftNavLinks.map((link) => (
-              <div key={link.name} className="relative">
+              <div key={link.name} className="relative z-50">
                 {link.hasDropdown ? (
                   <div className="relative products-dropdown">
                     <button
@@ -157,7 +157,7 @@ const Navigation = () => {
                       />
                     </button>
                     {productsDropdown && (
-                      <div className="absolute top-full left-0 mt-1 w-52 rounded-lg shadow-xl border overflow-hidden z-50 bg-white border-gray-200">
+                      <div className="absolute top-full left-0 mt-1 w-52 rounded-lg shadow-xl border overflow-hidden z-[9999] bg-white border-gray-200">
                         {productsDropdownItems.map((item) => (
                           <Link
                             key={item.path}
@@ -238,7 +238,7 @@ const Navigation = () => {
               <Heart size={18} />
             </Link>
             {currentUser ? (
-              <div className="relative whitespace-nowrap">
+              <div className="relative whitespace-nowrap z-50">
                 <button
                   onClick={() => setUserDropdown(!userDropdown)}
                   className="flex items-center text-sm font-medium text-white transition-colors px-3 py-1.5 rounded-full bg-burgundy-700 hover:bg-burgundy-800"
@@ -247,7 +247,7 @@ const Navigation = () => {
                   Hi, {currentUser.name?.split(' ')[0] || 'User'}
                 </button>
                 {userDropdown && (
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50">
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-[9999]">
                     <Link
                       to="/profile"
                       onClick={() => setUserDropdown(false)}

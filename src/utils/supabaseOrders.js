@@ -289,3 +289,156 @@ export const getOrderAnalytics = async () => {
 export const isSupabaseConfigured = () => {
   return supabase !== null;
 };
+
+/**
+ * Cancel order (customer side)
+ */
+export const cancelOrder = async (orderId, reason = '') => {
+  try {
+    if (!supabase) {
+      throw new Error('Supabase not configured');
+    }
+
+    const { data: currentOrder } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('id', orderId)
+      .single();
+
+    if (!currentOrder) {
+      throw new Error('Order not found');
+    }
+
+    // Only allow cancellation for Pending or Confirmed orders
+    if (currentOrder.status !== 'Pending' && currentOrder.status !== 'Confirmed') {
+      throw new Error('Order cannot be cancelled at this stage');
+    }
+
+    const statusHistory = currentOrder.status_history || [];
+    statusHistory.push({
+      status: 'Cancelled',
+      timestamp: new Date().toISOString(),
+      note: reason || 'Order cancelled by customer',
+    });
+
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ 
+        status: 'Cancelled',
+        status_history: statusHistory,
+        payment_status: 'Refunded'
+      })
+      .eq('id', orderId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, order: data };
+  } catch (error) {
+    console.error('Error cancelling order:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Update payment method
+ */
+export const updatePaymentMethod = async (orderId, newPaymentMethod) => {
+  try {
+    if (!supabase) {
+      throw new Error('Supabase not configured');
+    }
+
+    const { data: currentOrder } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('id', orderId)
+      .single();
+
+    if (!currentOrder) {
+      throw new Error('Order not found');
+    }
+
+    // Only allow payment method change for COD orders
+    if (currentOrder.payment_method !== 'Cash on Delivery' && currentOrder.payment_method !== 'COD') {
+      throw new Error('Payment method can only be changed for Cash on Delivery orders');
+    }
+
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ payment_method: newPaymentMethod })
+      .eq('id', orderId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, order: data };
+  } catch (error) {
+    console.error('Error updating payment method:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Validate coupon code
+ */
+export const validateCoupon = async (couponCode, orderTotal) => {
+  try {
+    if (!supabase) {
+      throw new Error('Supabase not configured');
+    }
+
+    const { data, error } = await supabase
+      .from('coupons')
+      .select('*')
+      .eq('code', couponCode.toUpperCase())
+      .single();
+
+    if (error || !data) {
+      return { success: false, error: 'Invalid coupon code' };
+    }
+
+    // Check if coupon is active
+    if (!data.is_active) {
+      return { success: false, error: 'This coupon is no longer active' };
+    }
+
+    // Check expiry
+    if (data.valid_until && new Date(data.valid_until) < new Date()) {
+      return { success: false, error: 'This coupon has expired' };
+    }
+
+    // Check minimum order value
+    if (data.min_order_amount && orderTotal < data.min_order_amount) {
+      return { success: false, error: `Minimum order of ₹${data.min_order_amount} required` };
+    }
+
+    // Check usage limit
+    if (data.usage_limit && data.usage_count >= data.usage_limit) {
+      return { success: false, error: 'This coupon has reached its usage limit' };
+    }
+
+    // Calculate discount
+    let discountAmount = 0;
+    if (data.discount_type === 'percentage') {
+      discountAmount = Math.round(orderTotal * (data.discount_value / 100));
+    } else {
+      discountAmount = data.discount_value;
+    }
+
+    // Apply max discount cap if set
+    if (data.max_discount_amount && discountAmount > data.max_discount_amount) {
+      discountAmount = data.max_discount_amount;
+    }
+
+    return { 
+      success: true, 
+      coupon: data, 
+      discountAmount,
+      message: `Coupon applied! You save ₹${discountAmount}`
+    };
+  } catch (error) {
+    console.error('Error validating coupon:', error);
+    return { success: false, error: error.message };
+  }
+};
