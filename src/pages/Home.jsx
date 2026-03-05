@@ -1011,9 +1011,9 @@ const Home = () => {
                       <p className="text-sm leading-relaxed mb-4 opacity-90">
                         {mood.liner}
                       </p>
-                      <button className="bg-white text-red-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-50 transition-colors transform hover:scale-105">
+                      <Link to="/products" className="bg-white text-red-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-50 transition-colors transform hover:scale-105 inline-block">
                         Shop {mood.title.toLowerCase()} vibes
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -1194,9 +1194,9 @@ const Home = () => {
 
                       {/* Bottom part - CTA Button */}
                       <div className="h-1/2 flex items-center justify-center">
-                        <button className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors">
+                        <Link to="/products" className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block">
                           Shop Now
-                        </button>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -1273,9 +1273,9 @@ const Home = () => {
 
                       {/* Bottom part - CTA Button */}
                       <div className="h-1/2 flex items-center justify-center">
-                        <button className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors">
+                        <Link to="/products" className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block">
                           Shop Now
-                        </button>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -1359,9 +1359,9 @@ const Home = () => {
 
                       {/* Bottom part - CTA Button */}
                       <div className="h-1/2 flex items-center justify-center">
-                        <button className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors">
+                        <Link to="/products" className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block">
                           Shop Now
-                        </button>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -1438,9 +1438,9 @@ const Home = () => {
 
                       {/* Bottom part - CTA Button */}
                       <div className="h-1/2 flex items-center justify-center">
-                        <button className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors">
+                        <Link to="/products" className="bg-white text-red-900 px-8 py-2 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block">
                           Shop Now
-                        </button>
+                        </Link>
                       </div>
                     </div>
                   </div>
