@@ -121,9 +121,40 @@ const Navigation = () => {
   return (
     <>
 
+      {/* Mobile Top Bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-rose-950 to-red-900 z-50 px-4 py-3 flex items-center justify-between">
+        {/* Hamburger Menu */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="text-white"
+        >
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
 
+        {/* Logo - Mobile */}
+        <Link to="/" className="h-8">
+          <img src={logoWhite} alt="Revieree" className="h-full w-auto" />
+        </Link>
+
+        {/* Right Icons - Mobile */}
+        <div className="flex items-center space-x-4">
+          <Link to="/cart" className="text-white relative">
+            <ShoppingBag size={20} />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                {cartCount > 99 ? '99+' : cartCount}
+              </span>
+            )}
+          </Link>
+        </div>
+      </div>
+
+      {/* Spacer for mobile top bar */}
+      <div className="md:hidden h-14"></div>
+
+      {/* Desktop Navbar */}
       <nav
-        className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ${
+        className={`hidden md:fixed top-6 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ${
           isDarkSection
             ? "bg-white border border-red-200 px-8 py-2 rounded-full shadow-lg"
             : "bg-gradient-to-r from-rose-950 to-red-900 px-8 py-2 rounded-full shadow-lg"
@@ -438,9 +469,10 @@ const Navigation = () => {
                   </Link>
                 </div>
               </div>
-
-              {/* User Section */}
-              <div className="pt-4 border-t border-gray-200 px-6 space-y-3">
+            </div>
+          </div>
+        )}
+      </nav>
     </>
   );
 };
